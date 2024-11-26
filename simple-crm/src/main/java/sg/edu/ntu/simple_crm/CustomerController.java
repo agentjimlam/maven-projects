@@ -19,33 +19,55 @@ import org.springframework.web.bind.annotation.PutMapping;
 // 3. Add in CRUD routes
 // 4. Handle exceptions
 
+/*
+ * Controller (Req/Res) <-> Service (Business Logic) <-> Repository (CRUD datastore)
+ */
+
+ // Controller Layer: Handles HTTP requests and responses, acting as the entry point for the application.
+ // 
+
+// Controller handles request from service layer, talks to Service to do things. Service tells Repository layer to do things.
 @RestController // Combines @Controller + @ResponseBody
 // @RequestMapping("/v1/customers")
 @RequestMapping("/customers")
 public class CustomerController {
 
-  private ArrayList<Customer> customers = new ArrayList<>();
+  // private CustomerService customerService = new CustomerService;
+  private CustomerService customerService;
 
-  public CustomerController(){
-    customers.add(new Customer("Bruce", "Banner"));
-    customers.add(new Customer("Peter", "Parker"));
-    customers.add(new Customer("Stephen", "Strange"));
-    customers.add(new Customer("Steve", "Rogers"));
-    customers.add(new Customer("Diana", "Price"));
+  // Constructor Injection
+  // @Autowired
+  // @Qualifier lets you specify the bean name for the injection
+  // public CustomerController(@Qualifier("customerServiceImpl") CustomerService customerService) {
+  public CustomerController (CustomerService customerService){ 
+    this.customerService = customerService; // When Spring Boot see the customer service type, Spring will "oh you want a CustomerService type of bean", Spring will look for which has implements CustomerService
   }
+
+  
+
+  // private ArrayList<Customer> customers = new ArrayList<>();
+
+  // public CustomerController(){
+  //   customers.add(new Customer("Bruce", "Banner"));
+  //   customers.add(new Customer("Peter", "Parker"));
+  //   customers.add(new Customer("Stephen", "Strange"));
+  //   customers.add(new Customer("Steve", "Rogers"));
+  //   customers.add(new Customer("Diana", "Price"));
+  // }
 
   /// Create a customer
   @PostMapping("")
   public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
-    customers.add(customer);
+    Customer newCustomer = customerService.createCustomer(customer);
     // return customer;
-    return new ResponseEntity<>(customer, HttpStatus.CREATED);
+    return new ResponseEntity<>(newCustomer, HttpStatus.CREATED);
   }
 
   // Read - get all customers
   @GetMapping("")
   public ResponseEntity<ArrayList<Customer>> getAllCustomers() {
-      return new ResponseEntity<>(customers, HttpStatus.OK);
+      ArrayList<Customer> allCustomers = customerService.getAllCustomers();
+      return new ResponseEntity<>(allCustomers, HttpStatus.OK);
   }
 
   // Read - get one customer
@@ -53,8 +75,8 @@ public class CustomerController {
   @GetMapping("/{id}")
   public ResponseEntity<Customer> getCustomer(@PathVariable String id) {
     try {
-      int index = getCustomerIndex(id);
-      return new ResponseEntity<>(customers.get(index), HttpStatus.OK);
+      Customer foundCustomer = customerService.getCustomer(id);
+      return new ResponseEntity<>(foundCustomer, HttpStatus.OK);
     } catch (CustomerNotFoundException e){
       return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404
     }
@@ -65,9 +87,7 @@ public class CustomerController {
   @PutMapping("/{id}")
   public ResponseEntity<Customer> updateCustomer(@PathVariable String id, @RequestBody Customer customer) {
     try {
-      int index = getCustomerIndex(id);
-      customers.set(index, customer);
-      Customer updatedCustomer = customers.get(index);
+      Customer updatedCustomer = customerService.updateCustomer(id, customer);
       return new ResponseEntity<>(updatedCustomer, HttpStatus.OK);
     } catch (CustomerNotFoundException e) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -86,8 +106,7 @@ public class CustomerController {
   @DeleteMapping("/{id}")
   public ResponseEntity<HttpStatus> deleteCustomer(@PathVariable String id) {
     try {
-      int index = getCustomerIndex(id);
-      customers.remove(index);
+      customerService.deleteCustomer(id);
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     } catch (CustomerNotFoundException e) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -95,15 +114,15 @@ public class CustomerController {
   }
 
   // Helper FUNCTION
-  private int getCustomerIndex(String id) {
-    for (Customer customer : customers) {
-      if (customer.getId().equals(id)) {
-        return customers.indexOf(customer);
-      }
-    }
-    // return -1;
-    throw new CustomerNotFoundException(id);
-  }
+  // private int getCustomerIndex(String id) {
+  //   for (Customer customer : customers) {
+  //     if (customer.getId().equals(id)) {
+  //       return customers.indexOf(customer);
+  //     }
+  //   }
+  //   // return -1;
+  //   throw new CustomerNotFoundException(id);
+  // }
   
   
 }
