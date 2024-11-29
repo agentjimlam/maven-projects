@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.PutMapping;
  * Controller (Req/Res) <-> Service (Business Logic) <-> Repository (CRUD datastore)
  */
 
-// Controller Layer: Handles HTTP requests and responses, acting as the entry point for the application.
-// 
+ // Controller Layer: Handles HTTP requests and responses, acting as the entry point for the application.
+ // 
 
 // Controller handles request from service layer, talks to Service to do things. Service tells Repository layer to do things.
 @RestController // Combines @Controller + @ResponseBody
@@ -38,22 +38,21 @@ public class CustomerController {
   // Constructor Injection
   // @Autowired
   // @Qualifier lets you specify the bean name for the injection
-  // public CustomerController(@Qualifier("customerServiceImpl") CustomerService
-  // customerService) {
-  public CustomerController(CustomerService customerService) {
-    this.customerService = customerService; // When Spring Boot see the customer service type, Spring will "oh you want
-                                            // a CustomerService type of bean", Spring will look for which has
-                                            // implements CustomerService
+  // public CustomerController(@Qualifier("customerServiceImpl") CustomerService customerService) {
+  public CustomerController (CustomerService customerService){ 
+    this.customerService = customerService; // When Spring Boot see the customer service type, Spring will "oh you want a CustomerService type of bean", Spring will look for which has implements CustomerService
   }
+
+  
 
   // private ArrayList<Customer> customers = new ArrayList<>();
 
   // public CustomerController(){
-  // customers.add(new Customer("Bruce", "Banner"));
-  // customers.add(new Customer("Peter", "Parker"));
-  // customers.add(new Customer("Stephen", "Strange"));
-  // customers.add(new Customer("Steve", "Rogers"));
-  // customers.add(new Customer("Diana", "Price"));
+  //   customers.add(new Customer("Bruce", "Banner"));
+  //   customers.add(new Customer("Peter", "Parker"));
+  //   customers.add(new Customer("Stephen", "Strange"));
+  //   customers.add(new Customer("Steve", "Rogers"));
+  //   customers.add(new Customer("Diana", "Price"));
   // }
 
   /// Create a customer
@@ -67,38 +66,45 @@ public class CustomerController {
   // Read - get all customers
   @GetMapping("")
   public ResponseEntity<ArrayList<Customer>> getAllCustomers() {
-    ArrayList<Customer> allCustomers = customerService.getAllCustomers();
-    return new ResponseEntity<>(allCustomers, HttpStatus.OK);
+      ArrayList<Customer> allCustomers = customerService.getAllCustomers();
+      return new ResponseEntity<>(allCustomers, HttpStatus.OK);
   }
 
   // Read - get one customer
   // localhost:8080/customers/35623130-bade-43d6-9bf4-6ea7189301fb
   @GetMapping("/{id}")
-  public ResponseEntity<Customer> getCustomer(@PathVariable Long id) {
+  public ResponseEntity<Customer> getCustomer(@PathVariable String id) {
     try {
       Customer foundCustomer = customerService.getCustomer(id);
       return new ResponseEntity<>(foundCustomer, HttpStatus.OK);
-    } catch (CustomerNotFoundException e) {
+    } catch (CustomerNotFoundException e){
       return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404
     }
-
+    
   }
 
   // Update
   @PutMapping("/{id}")
-  public ResponseEntity<Customer> updateCustomer(@PathVariable Long id, @RequestBody Customer customer) {
+  public ResponseEntity<Customer> updateCustomer(@PathVariable String id, @RequestBody Customer customer) {
     try {
       Customer updatedCustomer = customerService.updateCustomer(id, customer);
       return new ResponseEntity<>(updatedCustomer, HttpStatus.OK);
     } catch (CustomerNotFoundException e) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-
+    
   }
 
   // Delete
+  // @DeleteMapping("/customers/{id}")
+  // public Customer deleteCustomer(@PathVariable String id) {
+  //   int index = getCustomerIndex(id);
+  //   return customers.remove(index);
+  // }
+
+  // Delete
   @DeleteMapping("/{id}")
-  public ResponseEntity<HttpStatus> deleteCustomer(@PathVariable Long id) {
+  public ResponseEntity<HttpStatus> deleteCustomer(@PathVariable String id) {
     try {
       customerService.deleteCustomer(id);
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -107,15 +113,18 @@ public class CustomerController {
     }
   }
 
-  // Nested route - add interaction to customer
-  @PostMapping("/{id}/interactions")
-  public ResponseEntity<Interaction> addInteractionToCustomer(@PathVariable Long id,
-      @RequestBody Interaction interaction) {
-    Interaction newInteraction = customerService.addInteractionToCustomer(id, interaction);
-    return new ResponseEntity<>(newInteraction, HttpStatus.CREATED);
-  }
-
-
+  // Helper FUNCTION
+  // private int getCustomerIndex(String id) {
+  //   for (Customer customer : customers) {
+  //     if (customer.getId().equals(id)) {
+  //       return customers.indexOf(customer);
+  //     }
+  //   }
+  //   // return -1;
+  //   throw new CustomerNotFoundException(id);
+  // }
+  
+  
 }
 
 // @Controller -> Returns views (HTML, Thymeleaf templates)
