@@ -2,7 +2,6 @@ package sg.edu.ntu.simple_crm;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -29,20 +28,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     public Customer getCustomer(Long id) {
-        // Customer foundCustomer = customerRepository.findById(id).get();
-        // return foundCustomer;
-
-        // Using Optional type method 
-        // Optional<Customer> optionalCustomer = customerRepository.findById(id);
-        // if(optionalCustomer.isPresent()) {
-        //     Customer foundCustomer = optionalCustomer.get();
-        //     return foundCustomer;
-        // }
-
-        // throw new CustomerNotFoundException(id);
-
-        //Shorter method
-        return customerRepository.findById(id).orElseThrow( ()-> new CustomerNotFoundException(id));
+        Customer foundCustomer = customerRepository.findById(id).get();
+        return foundCustomer;
     }
 
     public ArrayList<Customer> getAllCustomers() {
@@ -52,9 +39,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     public Customer updateCustomer(Long id, Customer customer) {
         // Retrieve the customer from db
-        // Customer customerToUpdate = customerRepository.findById(id).get();
-        Customer customerToUpdate = customerRepository.findById(id).orElseThrow(()-> new CustomerNotFoundException(id));
-
+        Customer customerToUpdate = customerRepository.findById(id).get();
         // Update the customer object that was retrieved
         customerToUpdate.setFirstName(customer.getFirstName());
         customerToUpdate.setLastName(customer.getLastName());
@@ -73,35 +58,11 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public Interaction addInteractionToCustomer(Long id, Interaction interaction) {
         // Retrieve customer from the db
-        // Customer selectedCustomer = customerRepository.findById(id).orElseThrow(()-> new CustomerNotFoundException(id));
-        // // Add customer to the interaction
-        // interaction.setCustomer(selectedCustomer);
-        // // Save interaction to db
-        // return interactionRepository.save(interaction);
-
-        // Using Optional Method
-        Optional<Customer> optionalSelectedCustomer = customerRepository.findById(id);
-        // Customer selectedCustomer = new Customer();
-        
-        if (optionalSelectedCustomer.isPresent()) {
-            Customer selectedCustomer = optionalSelectedCustomer.get();
-            interaction.setCustomer(selectedCustomer);
-            return interactionRepository.save(interaction);
-        }
-
-        throw new InteractionNotFoundException(id);
-        
-    }
-
-    @Override
-    public List<Customer> getCustomersByFirstName(String firstName) {
-        List<Customer> foundCustomers = customerRepository.findByFirstNameIgnoreCase(firstName);
-        return foundCustomers;
-    }
-
-    @Override
-    public List<Customer> getCustomersWithNoInteraction() {
-        return customerRepository.findByInteractionsIsEmpty();
+        Customer selectedCustomer = customerRepository.findById(id).get();
+        // Add customer to the interaction
+        interaction.setCustomer(selectedCustomer);
+        // Save interaction to db
+        return interactionRepository.save(interaction);
     }
 
 }

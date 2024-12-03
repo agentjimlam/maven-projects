@@ -43,18 +43,24 @@ public class InteractionController {
     // localhost:8080/customers/35623130-bade-43d6-9bf4-6ea7189301fb
     @GetMapping("/{id}")
     public ResponseEntity<Interaction> getInteraction(@PathVariable Long id) {
-
+        try {
             Interaction foundInteraction = interactionService.getInteraction(id);
             return new ResponseEntity<>(foundInteraction, HttpStatus.OK);
+        } catch (InteractionNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 404
+        }
 
     }
 
     // Update
     @PutMapping("/{id}")
     public ResponseEntity<Interaction> updateInteraction(@PathVariable Long id, @RequestBody Interaction interaction) {
-
+        try {
             Interaction updateInteraction = interactionService.updateInteraction(id, interaction);
             return new ResponseEntity<>(updateInteraction, HttpStatus.OK);
+        } catch (InteractionNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 
     }
     
