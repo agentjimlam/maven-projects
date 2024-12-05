@@ -1,0 +1,5 @@
+Entity class (ResponeEntity) is also called Model class. in case they ask in interview
+
+GlobalExceptionalHandler is the standard way to handle exceptions in realtime projects. We don't clutter the controller with try...catching of errors. 
+
+Don't be confused with @Builder. it also creates an object like constructors. However, there are some advantages of using a builder instead of constructor. 
